@@ -11,7 +11,7 @@ test = {
 
 @app.route('/test', methods=['GET'])
 def testing():
-    return test
+    return jsonify(test)
 
 @app.route('/get_gambar', methods=['GET'])
 def get_data():
@@ -21,9 +21,18 @@ def get_data():
 
 @app.route('/post_gambar', methods=['POST'])
 def post_gambar():
-    img = request.form['img_name']
-    cv2.imwrite('images/'+img)
-    return img
+    file = request.files['file']
+    if 'file' not in request.files:
+        return "No File part", 400
+
+    if file.filename == '':
+        return "No Selected file", 400
+
+    if file:
+        filename = file.filename
+        img_path = os.path.join('images/'+filename)
+        file.save(img_path)
+        return f"File {filename} uploaded successfully", 201
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
