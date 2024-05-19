@@ -8,7 +8,6 @@ test = {
     'coba': 'testing'
 }
 
-
 @app.route('/test', methods=['GET'])
 def testing():
     return jsonify(test)
@@ -16,8 +15,16 @@ def testing():
 @app.route('/get_gambar', methods=['GET'])
 def get_data():
     img_path = os.listdir('images')
-    img = cv2.imread('images/'+img_path)
-    return img
+    if not img_path:
+        return "No image found", 400
+
+    img = cv2.imread('images/'+img_path[0])
+    if img is None:
+        return "Failed to read images", 400
+
+    _, img_encoded = cv2.imencode('.jpg', img)
+    response = img_encoded.tobytes()
+    return response, 200, {'Content-Type': 'image/jpeg'}
 
 @app.route('/post_gambar', methods=['POST'])
 def post_gambar():
